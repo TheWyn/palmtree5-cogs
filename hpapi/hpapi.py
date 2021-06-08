@@ -149,9 +149,8 @@ class Hpapi:
         async with self.session.get(url) as r:
             if r.status == 204:  # name is not in use
                 return None
-            else:
-                data = await r.json()
-                return data["id"]
+            data = await r.json()
+            return data["id"]
 
     @staticmethod
     def get_time(ms):
@@ -337,9 +336,11 @@ class Hpapi:
             game_n = game
             game_name = game_n.lower().strip()
             for game in self.games:
-                if game_name == game["clean_name"].lower() or\
-                        game_name == game["db_name"].lower() or\
-                        game_name == game["type_name"].lower():
+                if game_name in [
+                    game["clean_name"].lower(),
+                    game["db_name"].lower(),
+                    game["type_name"].lower(),
+                ]:
                     game_name = game["clean_name"]
                     game_type = game["id"]
                     break
@@ -408,7 +409,7 @@ class Hpapi:
                                ))
             em = randomize_colour(em)
 
-            em.add_field(name="Rank", value=rank if rank else "None")
+            em.add_field(name="Rank", value=rank or "None")
             em.add_field(name="Level", value=str(get_network_level(player_data["networkExp"])))
 
             if "mostRecentGameType" in player_data:
@@ -448,11 +449,11 @@ class Hpapi:
             api_key,
             uuid_json["id"]
         ))
-        friends_list = []
         if friends_json["success"]:
             msg = await ctx.send(
                 "Looking up friends for {}. This may take a while if the user has "
                 "a lot of users on their friends list".format(player_name))
+            friends_list = []
             async with ctx.channel.typing():
                 # gives some indication that the command is working, because
                 # this could take some time if the specified player has a lot
@@ -461,11 +462,10 @@ class Hpapi:
                     if item["uuidSender"] == uuid_json["id"]:
                         name_url = "https://api.mojang.com/user/profiles/" \
                             + item["uuidReceiver"] + "/names"
-                        name_data = await self.get_json(name_url)
                     else:
                         name_url = "https://api.mojang.com/user/profiles/" \
                             + item["uuidSender"] + "/names"
-                        name_data = await self.get_json(name_url)
+                    name_data = await self.get_json(name_url)
                     friend_name = name_data[-1]["name"]  # last item in list is most recent name
                     cur_friend = {
                         "name": player_name,

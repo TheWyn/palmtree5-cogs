@@ -82,9 +82,7 @@ class Tweets:
             raise NoClientException("Have you set the access credentials with `[p]tweetset creds`?")
         user = await self.client.api.users.show.get(screen_name=username)
 
-        colour =\
-            ''.join([randchoice('0123456789ABCDEF')
-                 for x in range(6)])
+        colour = ''.join(randchoice('0123456789ABCDEF') for x in range(6))
         colour = int(colour, 16)
         url = "https://twitter.com/" + user.screen_name
         emb = discord.Embed(title=user.name,

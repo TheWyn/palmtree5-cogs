@@ -80,8 +80,8 @@ def get_achievement_points(achievement_list, data):
 
 
 def count_quest_completions(data):
-    total_completed = 0
-    for quest in data["quests"]:
-        if "completions" in data["quests"][quest]:
-            total_completed += len(data["quests"][quest]["completions"])
-    return total_completed
+    return sum(
+        len(data["quests"][quest]["completions"])
+        for quest in data["quests"]
+        if "completions" in data["quests"][quest]
+    )

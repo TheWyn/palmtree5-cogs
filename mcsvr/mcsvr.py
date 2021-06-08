@@ -140,7 +140,6 @@ class Mcsvr:
             orig_topic = await self.config.channel(channel).original_topic()
             await channel.edit(topic=orig_topic)
             await self.config.channel(channel).original_topic.set("")
-            await ctx.tick()
         else:
             if server_ip is None:
                 await ctx.send("Tracker is in embed mode but no server was passed to remove!")
@@ -157,7 +156,8 @@ class Mcsvr:
             await msg.delete()
             servers.remove(to_remove)
             await self.config.channel(channel).servers.set(servers)
-            await ctx.tick()
+
+        await ctx.tick()
 
     @commands.group()
     @commands.guild_only()
@@ -211,16 +211,15 @@ class Mcsvr:
         return True
 
     async def do_mode_toggle_cleanup(self, mode, guild: discord.Guild):
-        if mode == "text":
-            for channel in guild.text_channels:
+        for channel in guild.text_channels:
+            if mode == "text":
                 current_server = await self.config.channel(channel).server_ip()
                 if current_server:
                     topic = await self.config.channel(channel).original_topic()
                     await channel.edit(topic=topic)
                     await self.config.channel(channel).current_server.set("")
                     await self.config.channel(channel).original_topic.set("")
-        else:
-            for channel in guild.text_channels:
+            else:
                 servers = await self.config.channel(channel).servers()
                 for server in servers:
                     msg = await channel.get_message(server["message"])

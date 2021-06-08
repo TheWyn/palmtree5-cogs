@@ -248,7 +248,7 @@ class Reddit:
             await ctx.send("Sorry, I don't have access to that subreddit")
             return
         resp_json = resp_json["data"]
-        colour = ''.join([randchoice('0123456789ABCDEF') for x in range(6)])
+        colour = ''.join(randchoice('0123456789ABCDEF') for x in range(6))
         colour = int(colour, 16)
         created_at = dt.utcfromtimestamp(resp_json["created_utc"])
         created_at = created_at.strftime("%m/%d/%Y %H:%M:%S")

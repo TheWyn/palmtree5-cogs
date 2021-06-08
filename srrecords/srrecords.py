@@ -34,8 +34,7 @@ class SRRecords:
     async def getrecords(self, ctx, game: str=None):
         """Gets records for the specified game"""
         guild = ctx.guild
-    
-        record_list = []
+
         if game is None:
             game = await self.config.guild(guild).game() if guild else None
             if not game:
@@ -56,6 +55,7 @@ class SRRecords:
             await ctx.send("An error occurred!")
             await ctx.send(cat_list["message"])
         else:
+            record_list = []
             for cat in cat_list["data"]:
                 cat_record = {}
                 record_url = "http://speedrun.com/api/v1/leaderboards/{}/category/{}".format(game, cat["id"])
@@ -65,10 +65,9 @@ class SRRecords:
                     game_info = await game_get.json()
                 cat_record["game_name"] = game_info["data"]["names"]["international"]
                 cat_record["cat_info"] = cat
-                if "data" in lead_list:
-                    if len(lead_list["data"]["runs"]) > 0:
-                        cat_record["record"] = lead_list["data"]["runs"][0]
-                        record_list.append(cat_record)
+                if "data" in lead_list and len(lead_list["data"]["runs"]) > 0:
+                    cat_record["record"] = lead_list["data"]["runs"][0]
+                    record_list.append(cat_record)
             await self.wr_menu(ctx, record_list, message=None, page=0, timeout=30)
 
     @checks.admin_or_permissions(manage_guild=True)
@@ -137,9 +136,7 @@ class SRRecords:
             await message.edit(embed=emb)
 
         def react_check(reaction: discord.Reaction, user):
-            if str(reaction.emoji) in numbs.values() and user == ctx.author:
-                return True
-            return False
+            return str(reaction.emoji) in numbs.values() and user == ctx.author
         try:
             react, user = await ctx.bot.wait_for("reaction_add", timeout=timeout, check=react_check)
         except asyncio.TimeoutError:
