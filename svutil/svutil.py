@@ -66,7 +66,7 @@ class SVUtil():
                     base_item_value = base_item["Value"]
                     if item["Item"] == "wine":
                         item["Value"] = math.floor(base_item_value * 3)
-                    elif item["Item"] == "jelly" or item["Item"] == "pickles":
+                    elif item["Item"] in ["jelly", "pickles"]:
                         item["Value"] == math.floor(base_item_value * 2)
                     elif item["Item"] == "juice":
                         item["Value"] == math.floor(base_item_value * 2.25)
@@ -82,7 +82,7 @@ class SVUtil():
                 score += 2
             elif item["Quality"] == "gold":
                 score += 3
-            
+
             if item["Value"] > 400 and item["Quality"] is "none":
                 score += 5
             elif item["Value"] > 300 and (item["Quality"] is "silver" or item["Quality"] is "none"):
@@ -93,12 +93,9 @@ class SVUtil():
                 score += 2
             elif item["Value"] > 20:
                 score += 1
-            
+
         category_list = list(set(category_list))
-        if len(category_list) > 6:
-            score += 30
-        else:
-            score += len(category_list) * 5
+        score += 30 if len(category_list) > 6 else len(category_list) * 5
         empty_penalty = 9 * (2 * (9 - len(items)))
         score += empty_penalty
 

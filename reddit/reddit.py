@@ -87,7 +87,7 @@ class Reddit():
                         for m in message["data"]["replies"]["data"]["children"]:
                             if m["data"]["created_utc"] > current_sub["timestamp"]:
                                 need_time_update = True
-                                colour = ''.join([randchoice('0123456789ABCDEF') for x in range(6)])
+                                colour = ''.join(randchoice('0123456789ABCDEF') for x in range(6))
                                 colour = int(colour, 16)
                                 created_at = dt.utcfromtimestamp(m["data"]["created_utc"])
                                 desc = "Created at " + created_at.strftime("%m/%d/%Y %H:%M:%S")
@@ -191,7 +191,7 @@ class Reddit():
         async with aiohttp.get(url, headers=headers) as req:
             resp_json = await req.json()
         resp_json = resp_json["data"]
-        colour = ''.join([randchoice('0123456789ABCDEF') for x in range(6)])
+        colour = ''.join(randchoice('0123456789ABCDEF') for x in range(6))
         colour = int(colour, 16)
         created_at = dt.utcfromtimestamp(resp_json["created_utc"])
         desc = "Created at " + created_at.strftime("%m/%d/%Y %H:%M:%S")
@@ -231,7 +231,7 @@ class Reddit():
                 await self.bot.say("Sorry, the currently authenticated account does not have access to that subreddit")
                 return
         resp_json = resp_json["data"]
-        colour = ''.join([randchoice('0123456789ABCDEF') for x in range(6)])
+        colour = ''.join(randchoice('0123456789ABCDEF') for x in range(6))
         colour = int(colour, 16)
         created_at = dt.utcfromtimestamp(resp_json["created_utc"])
         created_at = created_at.strftime("%m/%d/%Y %H:%M:%S")

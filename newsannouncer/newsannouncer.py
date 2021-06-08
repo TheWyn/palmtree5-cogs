@@ -153,9 +153,9 @@ def check_folder():
 
 def check_file():
     """Data file validator"""
-    data = {}
     if not dataIO.is_valid_json("data/newsannouncer/settings.json"):
         print("Creating settings.json for newsannouncer")
+        data = {}
         dataIO.save_json("data/newsannouncer/settings.json", data)
 
 

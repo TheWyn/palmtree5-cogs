@@ -27,8 +27,7 @@ class Hpapi():
         settings = dataIO.load_json(self.settings_file)
         self.hpapi_key = settings['API_KEY']
         self.games = dataIO.load_json(os.path.join('data', 'hpapi', 'games.json'))
-        self.payload = {}
-        self.payload["key"] = self.hpapi_key
+        self.payload = {"key": self.hpapi_key}
         if os.path.isfile("data/hpapi/achievements.json"):
             self.achievements = dataIO.load_json("data/hpapi/achievements.json")
 
@@ -218,9 +217,7 @@ class Hpapi():
 
                         name_data = await self.get_json(name_get_url)
                         name = name_data[-1]["name"]
-                        colour =\
-                            ''.join([randchoice('0123456789ABCDEF')
-                                     for x in range(6)])
+                        colour = ''.join(randchoice('0123456789ABCDEF') for x in range(6))
                         colour = int(colour, 16)
                         created_at = dt.utcfromtimestamp(item["dateActivated"]/1000)
                         created_at = created_at.strftime("%Y-%m-%d %H:%M:%S")
@@ -251,9 +248,7 @@ class Hpapi():
         if data["success"]:
             player_data = data["player"]
             title = "Player data for " + name + ""
-            colour =\
-                ''.join([randchoice('0123456789ABCDEF')
-                         for x in range(6)])
+            colour = ''.join(randchoice('0123456789ABCDEF') for x in range(6))
             colour = int(colour, 16)
             em = discord.Embed(title=title,
                                colour=discord.Colour(value=colour),
@@ -298,10 +293,9 @@ class Hpapi():
             em.add_field(name="Rank", value=rank)
             if "networkLevel" in player_data:
                 level = str(player_data["networkLevel"])
-                em.add_field(name="Level", value=level)
             else:
                 level = "1"
-                em.add_field(name="Level", value=level)
+            em.add_field(name="Level", value=level)
             if "vanityTokens" in player_data:
                 tokens = str(player_data["vanityTokens"])
                 em.add_field(name="Credits", value=tokens)
@@ -327,17 +321,16 @@ class Hpapi():
             self.hpapi_key,
             uuid_json["id"]
         ))
-        friends_list = []
         if friends_json["success"]:
+            friends_list = []
             for item in friends_json["records"]:
                 if item["uuidSender"] == uuid_json["id"]:
                     name_url = "https://api.mojang.com/user/profiles/" \
                         + item["uuidReceiver"] + "/names"
-                    name_data = await self.get_json(name_url)
                 else:
                     name_url = "https://api.mojang.com/user/profiles/" \
                         + item["uuidSender"] + "/names"
-                    name_data = await self.get_json(name_url)
+                name_data = await self.get_json(name_url)
                 friend_name = name_data[-1]["name"]
                 cur_friend = {
                     "name": player_name,
@@ -376,9 +369,7 @@ class Hpapi():
         guildmaster_lookup = await self.get_json("https://api.mojang.com/user/profiles/{}/names".format(guildmaster_uuid))
         guildmaster = guildmaster_lookup[-1]["name"]
         guildmaster_face = "http://minotar.net/avatar/{}/128.png".format(guildmaster)
-        colour =\
-            ''.join([randchoice('0123456789ABCDEF')
-                     for x in range(6)])
+        colour = ''.join(randchoice('0123456789ABCDEF') for x in range(6))
         colour = int(colour, 16)
         em = discord.Embed(title=guild["name"],
                            colour=discord.Colour(value=colour),
@@ -418,14 +409,14 @@ class Hpapi():
         url = "https://api.hypixel.net/player?key=" + \
             self.hpapi_key + "&name=" + player
         data = await self.get_json(url)
-        points = 0
-        achievement_count = 0
         if data["success"]:
             onetime = [item for item in data["player"]["achievementsOneTime"] if item.startswith(game)]
             tiered = [item for item in list(data["player"]["achievements"].keys()) if item.startswith(game)]
-            if len(onetime) == 0 and len(tiered) == 0:
+            if not onetime and not tiered:
                 await self.bot.say("That player hasn't completed any achievements for that game!")
                 return
+            points = 0
+            achievement_count = 0
             for item in onetime:
                 achvmt_name = item[item.find("_")+1:]
                 achvmt = self.achievements["achievements"][game.lower()]["one_time"][achvmt_name.upper()]
@@ -477,10 +468,9 @@ def check_folder():
 
 def check_file():
     f = "data/hpapi/hpapi.json"
-    data = {}
-    data["API_KEY"] = ''
     if not dataIO.is_valid_json(f):
         print("Creating default hpapi.json...")
+        data = {"API_KEY": ''}
         dataIO.save_json(f, data)
 
 def setup(bot):

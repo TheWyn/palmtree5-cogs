@@ -74,22 +74,18 @@ class Mcsvr:
     @commands.command(pass_context=True, no_pm=True)
     async def addserver(self, ctx, channel: discord.Channel, server_ip: str):
         """Add a server to the tracker"""
-        if not channel or not server_ip:
-            await self.bot.say("Sorry, can't do that! Try specifying a channel and a server IP")
-        else:
+        if channel and server_ip:
             chn_name = channel.name
             svr_id = ctx.message.server.id
             if svr_id not in self.settings:
                 self.settings[svr_id] = []
             loop = asyncio.get_event_loop()
             mc_server = await loop.run_in_executor(None, partial(self.check_server, server_ip))
-            if mc_server is not None:
-                emb = await self.get_server_embed(mc_server, server_ip)
-                msg = await self.bot.send_message(channel, embed=emb)
-            else:
+            if mc_server is None:
                 emb = await self.get_server_embed(None, server_ip)
-                msg = await self.bot.send_message(channel, embed=emb)
-
+            else:
+                emb = await self.get_server_embed(mc_server, server_ip)
+            msg = await self.bot.send_message(channel, embed=emb)
             svr_to_add = {
                 "chn_id": channel.id,
                 "server_ip": server_ip,
@@ -98,6 +94,9 @@ class Mcsvr:
             self.settings[svr_id].append(svr_to_add)
             dataIO.save_json(self.settings_file, self.settings)
             await self.bot.say("Done adding that server!")
+
+        else:
+            await self.bot.say("Sorry, can't do that! Try specifying a channel and a server IP")
 
     @commands.command(pass_context=True, no_pm=True)
     @checks.admin_or_permissions(administrator=True)
@@ -148,7 +147,6 @@ class Mcsvr:
                 title="Server info for {}".format(server_ip)
             )
             emb.add_field(name="Online", value="No")
-            return emb
         else:
             players = None
             brand = None
@@ -182,7 +180,8 @@ class Mcsvr:
                     if code in motd:
                         motd = motd.replace(code, "")
                 emb.add_field(name="MOTD", value=motd)
-            return emb
+
+        return emb
 
     async def mc_servers_check(self):
         CHECK_TIME = 120

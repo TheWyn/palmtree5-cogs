@@ -21,7 +21,7 @@ class BanRole():
         hierarchy than the role you want it to ban"""
         server = ctx.message.server
         roles = [r for r in server.roles if r.name == role]
-        if len(roles) == 0:
+        if not roles:
             await self.bot.say("That role doesn't exist!")
             return
         members_to_ban = [m for m in server.members if roles[0] in m.roles]
@@ -54,7 +54,7 @@ class BanRole():
         they were banned"""
         server = ctx.message.server
         roles = [r for r in server.roles if r.name == role]
-        if len(roles) == 0:
+        if not roles:
             await self.bot.say("That role doesn't exist!")
             return
         if roles[0].id not in self.banlist[server.id]:

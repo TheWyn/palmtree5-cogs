@@ -19,7 +19,7 @@ class Lockdown():
         server = ctx.message.server
         mod = self.bot.settings.get_server_mod(server)
         admin = self.bot.settings.get_server_admin(server)
-        role_list = [role for role in server.roles if role.name != mod and role.name != admin]
+        role_list = [role for role in server.roles if role.name not in [mod, admin]]
         if server.id in self.settings:
             for channel in server.channels:
                 if channel.id in self.settings[server.id]["channels"] and\
@@ -54,7 +54,7 @@ class Lockdown():
         server = ctx.message.server
         mod = self.bot.settings.get_server_mod(server)
         admin = self.bot.settings.get_server_admin(server)
-        role_list = [role for role in server.roles if role.name != mod and role.name != admin]
+        role_list = [role for role in server.roles if role.name not in [mod, admin]]
         if server.id in self.settings:
             for channel in server.channels:
                 if channel.id in self.settings[server.id]["channels"] and\
@@ -82,14 +82,11 @@ class Lockdown():
            Options for status are on or off"""
         server = ctx.message.server
         new_status = None
-        if status.lower() != "on" and status.lower() != "off":
+        if status.lower() not in ["on", "off"]:
             await self.bot.say("Invalid status specified!")
             return
         else:
-            if status.lower() == "on":
-                new_status = True
-            else:
-                new_status = False
+            new_status = status.lower() == "on"
         if server.id not in self.settings:
             self.settings[server.id] = {}
         if "channels" not in self.settings[server.id]:

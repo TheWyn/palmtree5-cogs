@@ -26,7 +26,6 @@ class SRRecords():
     async def getrecords(self, ctx, game: str=None):
         """Gets records for the specified game"""
         server = ctx.message.server
-        record_list = []
         if game is None:
             if server.id in self.settings["servers"]:
                 game = self.settings["servers"][server.id]
@@ -38,6 +37,7 @@ class SRRecords():
         if "status" in cat_list and cat_list["status"] == 404:
             await self.bot.say(cat_list["message"])
         else:
+            record_list = []
             for cat in cat_list["data"]:
                 cat_record = {}
                 record_url = "http://speedrun.com/api/v1/leaderboards/{}/category/{}".format(game, cat["id"])
@@ -48,10 +48,9 @@ class SRRecords():
                 cat_record["game_name"] = game_info["data"]["names"]["international"]
                 cat_record["cat_info"] = cat
                 print(cat["id"])
-                if "data" in lead_list:
-                    if len(lead_list["data"]["runs"]) > 0:
-                        cat_record["record"] = lead_list["data"]["runs"][0]
-                        record_list.append(cat_record)
+                if "data" in lead_list and len(lead_list["data"]["runs"]) > 0:
+                    cat_record["record"] = lead_list["data"]["runs"][0]
+                    record_list.append(cat_record)
             await self.wr_menu(ctx, record_list, message=None, page=0, timeout=30)
         
     @checks.admin_or_permissions(manage_sever=True)

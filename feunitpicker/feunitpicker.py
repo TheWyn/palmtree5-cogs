@@ -54,10 +54,10 @@ class FEUnitPicker():
 
         def gba_stats_check(msg):
             stats = msg.content.split(" ")
-            for stat in stats:
-                if stat not in game_data["stat_types"] and stat != "none":
-                    return False
-            return True
+            return not any(
+                stat not in game_data["stat_types"] and stat != "none"
+                for stat in stats
+            )
 
         def yn_check(msg):
             return "yes" in msg.content.lower() or "no" in msg.content.lower()
@@ -177,16 +177,22 @@ class FEUnitPicker():
             chap_list = data["chapters"][draft_settings["route"]]["ch_list"]
             shuffle(chap_list)
             chapter = choice(chap_list)
-            if next_char not in picks:
-                if chapter in data["chapters"][draft_settings["route"]]["recruitments"]\
-                        and next_char in data["chapters"][draft_settings["route"]]["recruitments"][chapter]:
-                    if data["characters"][next_char]["prepro"] and prepromotes_left > 0:
-                        picks.append(next_char)
-                        char_count -= 1
-                        prepromotes_left -= 1
-                    elif not data["characters"][next_char]["prepro"]:
-                        picks.append(next_char)
-                        char_count -= 1
+            if (
+                next_char not in picks
+                and chapter
+                in data["chapters"][draft_settings["route"]]["recruitments"]
+                and next_char
+                in data["chapters"][draft_settings["route"]]["recruitments"][
+                    chapter
+                ]
+            ):
+                if data["characters"][next_char]["prepro"] and prepromotes_left > 0:
+                    picks.append(next_char)
+                    char_count -= 1
+                    prepromotes_left -= 1
+                elif not data["characters"][next_char]["prepro"]:
+                    picks.append(next_char)
+                    char_count -= 1
         return picks
 
 
