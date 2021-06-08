@@ -26,8 +26,8 @@ class MentionTracker():
             self.settings[author.id] = {}
         if channel.id not in self.settings[author.id]:
             self.settings[author.id][channel.id] = None
-        if status.lower() == "on" or status.lower() == "off":
-            self.settings[author.id][channel.id] = True if status.lower() == "on" else False
+        if status.lower() in ["on", "off"]:
+            self.settings[author.id][channel.id] = status.lower() == "on"
             dataIO.save_json("data/mentiontracker/settings.json", self.settings)
             await self.bot.say("Mention tracker toggled!")
         else:
@@ -80,9 +80,11 @@ class MentionTracker():
             await self.bot.say("You haven't set any words to be tracked!")
         else:
             head = "Tracked words for {}#{} in #{}".format(author.name, author.discriminator, channel.name)
-            msg = ""
-            for word in self.settings[author.id]["words"][channel.id]:
-                msg += "{}\n".format(word)
+            msg = "".join(
+                "{}\n".format(word)
+                for word in self.settings[author.id]["words"][channel.id]
+            )
+
             await self.bot.say(box(msg, lang=head))
 
     async def check_message(self, message):

@@ -86,15 +86,17 @@ class EventMaker():
         server = ctx.message.server
         allowed_roles = []
         server_owner = server.owner
-        if server.id in self.settings:
-            if self.settings[server.id]["role"] is not None:
-                specified_role =\
-                    [r for r in server.roles if r.id == self.settings[server.id]["role"]][0]
-                allowed_roles.append(specified_role)
-                allowed_roles.append(self.bot.settings.get_server_mod(server))
-                allowed_roles.append(self.bot.settings.get_server_admin(server))
+        if (
+            server.id in self.settings
+            and self.settings[server.id]["role"] is not None
+        ):
+            specified_role =\
+                [r for r in server.roles if r.id == self.settings[server.id]["role"]][0]
+            allowed_roles.append(specified_role)
+            allowed_roles.append(self.bot.settings.get_server_mod(server))
+            allowed_roles.append(self.bot.settings.get_server_admin(server))
 
-        if len(allowed_roles) > 0 and author != server_owner:
+        if allowed_roles and author != server_owner:
             for role in author.roles:
                 if role in allowed_roles:
                     break
@@ -231,7 +233,7 @@ class EventMaker():
                     name="Start time (UTC)", value=dt.utcfromtimestamp(
                         event["event_start_time"]))
                 events.append(emb)
-        if len(events) == 0:
+        if not events:
             await self.bot.say("No events available to join!")
         else:
             await self.event_menu(ctx, events, message=None, page=0, timeout=30)
@@ -259,7 +261,7 @@ class EventMaker():
         if event_id < self.settings[server.id]["next_id"]:
             to_remove =\
                 [event for event in self.events[server.id] if event["id"] == event_id]
-            if len(to_remove) == 0:
+            if not to_remove:
                 await self.bot.say("No event to remove!")
             else:
                 self.events[server.id].remove(to_remove[0])

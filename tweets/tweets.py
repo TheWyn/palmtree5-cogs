@@ -23,7 +23,7 @@ numbs = {
 class TweetListener(tw.StreamListener):
 
     def on_status(self, status):
-        message = {
+        return {
             "name": status.user.name,
             "status": status.text,
             "created_at": status.created_at,
@@ -31,7 +31,6 @@ class TweetListener(tw.StreamListener):
             "status_id": status.id,
             "retweets": status.retweet_count
         }
-        return message
 
 
 class Tweets():
@@ -131,9 +130,7 @@ class Tweets():
             api = self.authenticate()
             user = api.get_user(username)
 
-            colour =\
-                ''.join([randchoice('0123456789ABCDEF')
-                     for x in range(6)])
+            colour = ''.join(randchoice('0123456789ABCDEF') for x in range(6))
             colour = int(colour, 16)
             url = "https://twitter.com/" + user.screen_name
             emb = discord.Embed(title=user.name,
@@ -158,8 +155,7 @@ class Tweets():
     async def get_tweets(self, ctx, username: str, count: int):
         """Gets the specified number of tweets for the specified username"""
         cnt = count
-        if count > 25:
-            cnt = 25
+        cnt = min(cnt, 25)
 
         if username is not None:
             if cnt < 1:
@@ -177,7 +173,7 @@ class Tweets():
                 await self.bot.say("Whoops! Something went wrong here. \
                     The error code is " + str(e))
                 return
-            if len(msg_list) > 0:
+            if msg_list:
                 await self.tweet_menu(ctx, msg_list, page=0, timeout=30)
             else:
                 await self.bot.say("No tweets available to display!")
@@ -355,11 +351,11 @@ def check_folder():
 
 
 def check_file():
-    data = {'consumer_key': '', 'consumer_secret': '',
-            'access_token': '', 'access_secret': '', 'servers': {}}
     f = "data/tweets/settings.json"
     if not dataIO.is_valid_json(f):
         print("Creating default settings.json...")
+        data = {'consumer_key': '', 'consumer_secret': '',
+                'access_token': '', 'access_secret': '', 'servers': {}}
         dataIO.save_json(f, data)
 
 

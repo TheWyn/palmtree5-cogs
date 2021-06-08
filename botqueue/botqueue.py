@@ -259,11 +259,11 @@ def check_folder():
 
 
 def check_file():
-    enabled = {}
-
     f = "data/botqueue/enabled.json"
     if not dataIO.is_valid_json(f):
         print("Creating default botqueue's enabled.json...")
+        enabled = {}
+
         dataIO.save_json(f, enabled)
 
 
