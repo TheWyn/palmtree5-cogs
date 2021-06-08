@@ -99,10 +99,11 @@ class SlowMode:
         if channel_slow == 0:
             return
         minimum_role_id = await self.settings.guild(message.guild).min_exempt_role()
-        if minimum_role_id == 0:
-            if await self.bot.is_mod(message.author) or \
-                    message.author == message.guild.owner:
-                return
+        if minimum_role_id == 0 and (
+            await self.bot.is_mod(message.author)
+            or message.author == message.guild.owner
+        ):
+            return
         role = discord.utils.get(message.guild.roles, id=minimum_role_id)
         if message.author.top_role >= role or message.author == message.guild.owner:
             return

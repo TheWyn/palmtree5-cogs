@@ -24,7 +24,6 @@ class BanRole:
 
         The bot's role must be higher than the role you want to ban
         """
-        failures = "I failed to ban the following members:\n"
         failure_list = []
         async with self.config.role(role).banned_members() as banned_list:
             for member in role.members:
@@ -39,6 +38,7 @@ class BanRole:
                 else:
                     banned_list.append(member.id)
         if failure_list:
+            failures = "I failed to ban the following members:\n"
             failures += "\n".join(failure_list)
             await ctx.send(failures)
         else:

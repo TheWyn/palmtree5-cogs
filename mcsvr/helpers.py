@@ -27,9 +27,7 @@ def is_valid_ip(addr: str):
     except ValueError:
         if not validators.domain(addr):
             return False
-    if port is not None and port not in range(0, 65535):
-        return False
-    return True
+    return port is None or port in range(65535)
 
 
 def check_server(addr: str) -> Union[discord.Embed, str, None]:
@@ -108,7 +106,6 @@ def get_server_embed(mc_server, server_ip):
             title="Server info for {}".format(server_ip)
         )
         emb.add_field(name="Online", value="No")
-        return emb
     else:
         players = None
         brand = None
@@ -143,4 +140,5 @@ def get_server_embed(mc_server, server_ip):
                     motd = motd.replace(code, "")
             emb.add_field(name="MOTD", value=motd)
 
-        return emb
+
+    return emb

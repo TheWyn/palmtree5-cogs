@@ -244,14 +244,10 @@ class EventMaker:
         events = []
         async with self.settings.guild(guild).events() as event_list:
             for event in event_list:
-                if started:
+                if not event["has_started"] or started:
                     emb = get_event_embed(guild, ctx.message.created_at, event)
                     events.append(emb)
-                else:
-                    if not event["has_started"]:
-                        emb = get_event_embed(guild, ctx.message.created_at, event)
-                        events.append(emb)
-        if len(events) == 0:
+        if not events:
             await ctx.send("No events available to join!")
         else:
             await self.event_menu(ctx, events, message=None, page=0, timeout=30)
@@ -281,7 +277,7 @@ class EventMaker:
         guild = ctx.guild
         async with self.settings.guild(guild).events() as event_list:
             to_remove = [event for event in event_list if event["id"] == event_id]
-            if len(to_remove) == 0:
+            if not to_remove:
                 await ctx.send("No event to remove!")
             else:
                 event = to_remove[0]
@@ -310,14 +306,17 @@ class EventMaker:
 
         Only admins and the guild owner may toggle DMs for users other than themselves
         """
-        if user:
-            if not await ctx.bot.is_admin(ctx.author) and not ctx.author == ctx.guild.owner:
-                await ctx.send("You are not allowed to toggle that for other users!")
-                return
+        if (
+            user
+            and not await ctx.bot.is_admin(ctx.author)
+            and ctx.author != ctx.guild.owner
+        ):
+            await ctx.send("You are not allowed to toggle that for other users!")
+            return
         if not user:
             user = ctx.author
         cur_val = await self.settings.member(user).dms()
-        await self.settings.member(user).dms.set(False if cur_val else True)
+        await self.settings.member(user).dms.set(not cur_val)
         await ctx.tick()
 
     @eventset.command(name="role")

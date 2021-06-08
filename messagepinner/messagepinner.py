@@ -34,23 +34,24 @@ class MessagePinner:
 
     async def on_message(self, message):
         """Message listener"""
-        if not isinstance(message.channel, discord.abc.PrivateChannel):
-            this_trigger = await self.settings.channel(message.channel).text()
-            if not this_trigger:
-                return  # no trigger set for this channel
-            if this_trigger in message.content and "pintrigger" not in message.content:
-                try:
-                    await message.pin()
-                except discord.Forbidden:
-                    await message.channel.send(
-                        "No permissions to do that! I "
-                        "need the 'manage messages' "
-                        "permission to do pin messages!"
-                    )
-                except discord.NotFound:
-                    print("That channel or message doesn't exist!")
-                except discord.HTTPException:
-                    await message.channel.send(
-                        "Something went wrong. Maybe "
-                        "check the number of pinned messages?"
-                    )
+        if isinstance(message.channel, discord.abc.PrivateChannel):
+            return
+        this_trigger = await self.settings.channel(message.channel).text()
+        if not this_trigger:
+            return  # no trigger set for this channel
+        if this_trigger in message.content and "pintrigger" not in message.content:
+            try:
+                await message.pin()
+            except discord.Forbidden:
+                await message.channel.send(
+                    "No permissions to do that! I "
+                    "need the 'manage messages' "
+                    "permission to do pin messages!"
+                )
+            except discord.NotFound:
+                print("That channel or message doesn't exist!")
+            except discord.HTTPException:
+                await message.channel.send(
+                    "Something went wrong. Maybe "
+                    "check the number of pinned messages?"
+                )
